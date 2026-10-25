@@ -55,7 +55,7 @@ async function importContacts(user, emails) {
 async function verifyOwnDomain(user, domain) {
 	fake.publishDns(domain);
 	const stored = await m.Domain.findOne({ accountId: user.accountId, domain }).lean();
-	assert.deepEqual(await as(user, () => m.domains.checkDomainAction(String(stored._id))), { ok: true, verified: true, archiveHostVerified: false });
+	assert.deepEqual(await as(user, () => m.domains.checkDomainAction(String(stored._id))), { ok: true, verified: true });
 }
 
 // A paying customer whose newsletter sends from its own domain, verified at Groundmail. Without a shared domain, a
@@ -247,7 +247,7 @@ describe("Groundmail domains", () => {
 			code: "validation_error",
 			checks: { ownership: true, dkim: true, spf: false, return_path: true, dmarc: false },
 		} });
-		assert.deepEqual(await as(user, () => m.domains.checkDomainAction(String(domain._id))), { ok: true, verified: false, archiveHostVerified: false });
+		assert.deepEqual(await as(user, () => m.domains.checkDomainAction(String(domain._id))), { ok: true, verified: false });
 		const checked = await m.Domain.findOne({ accountId: user.accountId, _id: domain._id }).lean();
 		assert.deepEqual([checked.dkimStatus, checked.mailFromStatus], ["SUCCESS", "PENDING"]);
 	});
